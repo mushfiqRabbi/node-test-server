@@ -4,8 +4,7 @@ COPY package*.json ./
 COPY tsconfig*.json ./
 RUN npm install
 COPY ./src ./src
-RUN mkdir -p dist
-RUN npm run build
+RUN mkdir -p dist && npm run build
 
 FROM node:20-alpine AS production
 WORKDIR /app

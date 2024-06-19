@@ -1,13 +1,21 @@
-name: learning-github-actions
-run-name: ${{ github.actor }} is learning GitHub Actions
+name: testing CI/CD
+run-name: ${{ github.actor }} is testing CI/CD
 on: [push]
 jobs:
-  build:
+  CI:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: List Files
-        run: |
-          pwd
-          ls -a
+      - name: Build the Docker image
+        run: docker build -t test-server .
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - name: Login to D0 container registry
+        run: doctl registry login --expiry-seconds 600
+      - name: Tag the image
+        run: docker tag test-server registry.digitalocean.com/ev-charge/test-server
+      - name: Push the image
+        run: docker push registry.digitalocean.com/ev-charge/test-server
